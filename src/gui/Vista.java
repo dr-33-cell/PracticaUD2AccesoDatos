@@ -1,8 +1,8 @@
 package gui;
 
+import base.enums.Fabricantes;
+import base.enums.Paises;
 import com.github.lgooddatepicker.components.DatePicker;
-import gui.base.enums.GenerosVideojuegos;
-import gui.base.enums.TiposCompanniaPlataformas;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -134,15 +134,15 @@ public class Vista extends JFrame{
         //recorrer los enumerados y los cargo en el comboBox correspondiente
         //.values cogemos valores del enumerado
         //.getValor los añadimos al combo
-        for (TiposCompanniaPlataformas constant: TiposCompanniaPlataformas.values()) {
-            comboTipoCompannia.addItem(constant.getValor());
+        for (Paises constant: Paises.values()) {
+            comBoxPais.addItem(constant.getValor());
         }
         //lo coloco en una posicion que no tenga valor
-        comboTipoCompannia.setSelectedIndex(-1);
-        for (GenerosVideojuegos constant: GenerosVideojuegos.values()) {
-            comboGenero.addItem(constant.getValor());
+        comBoxPais.setSelectedIndex(-1);
+        for (Fabricantes constant: Fabricantes.values()) {
+            comBoxFabricPlatform.addItem(constant.getValor());
         }
-        comboGenero.setSelectedIndex(-1);
+        comBoxFabricPlatform.setSelectedIndex(-1);
     }
     private void setTableModels() {
         //librosTabla, autoresTabla, editorialesTabla
