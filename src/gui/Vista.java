@@ -12,51 +12,53 @@ public class Vista extends JFrame{
     private JPanel panel1;
     private final static String TITULO_FRAME="Aplicacion tiendaVideojuegos";
 
-    //libros
+    //Desarrolladores
+    JPanel JPanelDesarrolladores;
+    JTextField txtIdDesarrolladores;
+    JTextField txtNombreDesarrolladores;
+    JTextField txtWebDesarrolladores;
+    JButton btnDesarrolladoresEliminar;
+    JButton btnDesarrolladoresModificar;
+    JButton btnDesarrolladoresAñadir;
+    JTable desarrolladoresTabla;
+
+    //Plataformas
+    JPanel JPanelPlataformas;
+    JTextField txtIdPlataformas;
+    JTextField txtNombrePlataformas;
+    JComboBox comBoxFabricPlatform;
+    JTextField txtGeneracionPlataformas;
+    DatePicker fechaPlataform;
+    JTextField txtTipoPlatform;
+    JButton btnPlataformasAñadir;
+    JButton btnPlataformasModificar;
+    JButton btnPlataformasEliminar;
+    JTable plataformasTabla;
+
+    //Videojuegos
     JPanel JPanelVideojuegos;
-    JTextField txtTituloVideojuego;
-    JComboBox comboCompanniaVideojugo;
-    JComboBox comboPlataformaVideojuego;
-    JComboBox comboGenero;
-    DatePicker fechaSalida;
-    JTextField txtIdVideojuego;
-    JTextField txtPrecioVideojuego;
-    JButton btnVideojuegosEliminar;
+    JTextField txtIdVideojuegos;
+    JTextField txtTitulovideojuegos;
+    JTextField txtCodigoVideojuegos;
+    JComboBox comBoxDesaVideojuegos;
+    JComboBox comBoxPlatformVideojuegos;
+    JTextField txtGeneroVideojuegos;
+    JTextField txtPrecioVideojuegos;
+    DatePicker fechaVideojuegos;
+    JTextField txtClasificacionVideojuegos;
+    JTextField txtStockVideojuegos;
+    JButton btnVideojuegosAñadir;
     JButton btnVideojuegosModificar;
-    JButton btnVideojuegosAnadir;
+    JButton btnVideojuegosEliminar;
     JTable videojuegosTabla;
-
-    //autores
-    JPanel JPanelFiguras;
-    JTextField txtNombre;
-    JTextField txtIdFiguras;
-    JTextField txtPrecioFiguras;
-    DatePicker fechaCreacion;
-    JButton btnFigurasAnadir;
-    JButton btnFigurasModificar;
-    JButton btnFigurasEliminar;
-    JTable figurasTabla;
-
-    //editoriales
-    JPanel JPanelCompannia;
-    JTextField txtIdCompannia;
-    JTextField txtNombreCompannia;
-    JTextField txtEmail;
-    JTextField txtTelefono;
-    JComboBox comboTipoCompannia;
-    JTextField txtWeb;
-    JButton btnCompanniaAnadir;
-    JButton btnCompanniaModificar;
-    JButton btnCompanniaEliminar;
-    JTable companniaTabla;
 
     //busqueda
     private JLabel etiquetaEstado;
 
     //default table model
-    DefaultTableModel dtmCompannia;
-    DefaultTableModel dtmFiguras;
     DefaultTableModel dtmVideojuegos;
+    DefaultTableModel dtmPlataformas;
+    DefaultTableModel dtmDesarrolladores;
 
     //menubar
     JMenuItem itemOpciones;
@@ -68,8 +70,9 @@ public class Vista extends JFrame{
     JDialog adminPasswordDialog;
     JButton btnValidate;
     JPasswordField adminPassword;
-    private JTabbedPane tabbedPane1;
-    private JComboBox comboBox1;
+    JTabbedPane tabbedPane1;
+    private JComboBox comBoxPais;
+
 
     public Vista() {
         super(TITULO_FRAME);
@@ -143,13 +146,13 @@ public class Vista extends JFrame{
     }
     private void setTableModels() {
         //librosTabla, autoresTabla, editorialesTabla
+        this.dtmDesarrolladores =new DefaultTableModel();
+        this.desarrolladoresTabla.setModel(dtmDesarrolladores);
+
+        this.dtmPlataformas =new DefaultTableModel();
+        this.plataformasTabla.setModel(dtmPlataformas);
+
         this.dtmVideojuegos =new DefaultTableModel();
         this.videojuegosTabla.setModel(dtmVideojuegos);
-
-        this.dtmFiguras =new DefaultTableModel();
-        this.figurasTabla.setModel(dtmFiguras);
-
-        this.dtmCompannia =new DefaultTableModel();
-        this.companniaTabla.setModel(dtmCompannia);
     }
 }

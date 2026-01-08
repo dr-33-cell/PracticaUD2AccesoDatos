@@ -7,7 +7,6 @@ import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.sql.*;
-import java.time.LocalDate;
 
 public class Controlador implements ActionListener, ItemListener, ListSelectionListener, WindowListener {
 
@@ -35,14 +34,14 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
     }
 
     private void addActionListeners(ActionListener listener) {
-        vista.btnVideojuegosAnadir.addActionListener(listener);
-        vista.btnVideojuegosAnadir.setActionCommand("anadirVideojuego");
+        vista.btnDesarrolladoresAñadir.addActionListener(listener);
+        vista.btnDesarrolladoresAñadir.setActionCommand("anadirVideojuego");
         vista.btnFigurasAnadir.addActionListener(listener);
         vista.btnFigurasAnadir.setActionCommand("anadirFigura");
         vista.btnCompanniaAnadir.addActionListener(listener);
         vista.btnCompanniaAnadir.setActionCommand("anadirCompannia");
-        vista.btnVideojuegosEliminar.addActionListener(listener);
-        vista.btnVideojuegosEliminar.setActionCommand("eliminarVideojuego");
+        vista.btnDesarrolladoresEliminar.addActionListener(listener);
+        vista.btnDesarrolladoresEliminar.setActionCommand("eliminarVideojuego");
         vista.btnFigurasEliminar.addActionListener(listener);
         vista.btnFigurasEliminar.setActionCommand("eliminarFigura");
         vista.btnCompanniaEliminar.addActionListener(listener);
@@ -403,14 +402,14 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
     private void refrescarCompannia() {
         try {
             ResultSet rs = modelo.consultarCompannia();
-            vista.dtmCompannia = construirTableModelCompannia(rs);
-            vista.companniaTabla.setModel(vista.dtmCompannia);
+            vista.dtmVideojuegos = construirTableModelCompannia(rs);
+            vista.companniaTabla.setModel(vista.dtmVideojuegos);
 
             // Refrescar combo de compañías
             vista.comboCompanniaVideojugo.removeAllItems();
-            for(int i = 0; i < vista.dtmCompannia.getRowCount(); i++) {
-                vista.comboCompanniaVideojugo.addItem(vista.dtmCompannia.getValueAt(i, 0) + " - " +
-                        vista.dtmCompannia.getValueAt(i, 1));
+            for(int i = 0; i < vista.dtmVideojuegos.getRowCount(); i++) {
+                vista.comboCompanniaVideojugo.addItem(vista.dtmVideojuegos.getValueAt(i, 0) + " - " +
+                        vista.dtmVideojuegos.getValueAt(i, 1));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -445,8 +444,8 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
     private void refrescarFiguras() {
         try {
             ResultSet rs = modelo.consultarFiguras();
-            vista.dtmFiguras = construirTableModelFiguras(rs);
-            vista.figurasTabla.setModel(vista.dtmFiguras);
+            vista.dtmPlataformas = construirTableModelFiguras(rs);
+            vista.figurasTabla.setModel(vista.dtmPlataformas);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -480,8 +479,8 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
     private void refrescarVideojuegos() {
         try {
             ResultSet rs = modelo.consultarVideojuegos();
-            vista.dtmVideojuegos = construirTableModelVideojuegos(rs);
-            vista.videojuegosTabla.setModel(vista.dtmVideojuegos);
+            vista.dtmDesarrolladores = construirTableModelVideojuegos(rs);
+            vista.videojuegosTabla.setModel(vista.dtmDesarrolladores);
         } catch (SQLException e) {
             e.printStackTrace();
         }
