@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6d4ada9c-42ed-42b5-a894-708ae9c74099" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/base/enums/Fabricantes.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/base/enums/Paises.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/base/enums/PaisDesarrolladores.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/Controlador.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Controlador.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/Modelo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Modelo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Vista.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Vista.form" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui/Vista.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Vista.java" afterDir="false" />
     </list>
@@ -77,6 +76,7 @@
       <workItem from="1767796463448" duration="9599000" />
       <workItem from="1767824461867" duration="5295000" />
       <workItem from="1767881794850" duration="7468000" />
+      <workItem from="1767970199299" duration="2184000" />
     </task>
     <servers />
   </component>

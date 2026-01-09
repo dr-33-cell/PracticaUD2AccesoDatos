@@ -16,6 +16,8 @@ public class Vista extends JFrame{
     JPanel JPanelDesarrolladores;
     JTextField txtIdDesarrolladores;
     JTextField txtNombreDesarrolladores;
+    JComboBox comBoxPais;
+    DatePicker fechaDesarrolladores;
     JTextField txtWebDesarrolladores;
     JButton btnDesarrolladoresEliminar;
     JButton btnDesarrolladoresModificar;
@@ -71,7 +73,7 @@ public class Vista extends JFrame{
     JButton btnValidate;
     JPasswordField adminPassword;
     JTabbedPane tabbedPane1;
-    private JComboBox comBoxPais;
+
 
 
     public Vista() {
