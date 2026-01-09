@@ -146,13 +146,12 @@ public class Modelo {
                 "nombre as 'Nombre', " +
                 "pais as 'País', " +
                 "fundacion as 'Fecha de fundación', " +
-                "web as 'Web', " +
-                "empleados as 'Empleados' " +
+                "web as 'Web' " +
                 "FROM desarrolladores";
         PreparedStatement sentencia = null;
         ResultSet resultado = null;
         sentencia = conexion.prepareStatement(sentenciaSql);
-        resultado = sentencia.sexecuteQuery();
+        resultado = sentencia.executeQuery();
         return resultado;
     }
 

@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS desarrolladores (
                                                nombre VARCHAR(100) NOT NULL,
                                                pais VARCHAR(50) NOT NULL,
                                                fundacion DATE,
-                                               web VARCHAR(500),
-                                               empleados INT);
+                                               web VARCHAR(500));
 --
 CREATE TABLE IF NOT EXISTS plataformas (
                                            idplataforma INT AUTO_INCREMENT PRIMARY KEY,
