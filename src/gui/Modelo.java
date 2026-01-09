@@ -286,7 +286,7 @@ public class Modelo {
                              float precio, LocalDate fechalanzamiento, String clasificacion, int unidadesstock, int idvideojuego) {
         String sentenciaSql = "UPDATE videojuegos SET titulo = ?, codigo = ?, iddesarrollador = ?, idplataforma = ?, " +
                 "genero = ?, precio = ?, fechalanzamiento = ?, clasificacion = ?, unidadesstock = ? WHERE idvideojuego = ?";
-        
+
         PreparedStatement sentencia = null;
 
         int iddesarrollador = Integer.valueOf(desarrollador.split(" ")[0]);

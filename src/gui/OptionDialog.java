@@ -7,7 +7,7 @@ public class OptionDialog extends JDialog{
     private JPanel panel1;
     JTextField txtIP;
     JTextField txtUsuario;
-    private JPasswordField pfPass;
+    JPasswordField pfPass;
     JButton btnOpcionesGuardar;
     JPasswordField pfAdmin;
     private Frame owner;
