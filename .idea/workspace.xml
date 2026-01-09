@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="PracticaUD2DanielRevuelto:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="6d4ada9c-42ed-42b5-a894-708ae9c74099" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PracticaUD2DanielRevuelto/gui/Modelo.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/PracticaUD2DanielRevuelto/gui/Modelo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/gui/Modelo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/Modelo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tienda_videojuegos.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tienda_videojuegos.sql" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -38,9 +40,9 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../LibreriaMVCCompleta" />
-    <property name="project.structure.last.edited" value="Libraries" />
-    <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -96,7 +98,7 @@
       <workItem from="1767824461867" duration="5295000" />
       <workItem from="1767881794850" duration="7468000" />
       <workItem from="1767970199299" duration="6898000" />
-      <workItem from="1767996992665" duration="1068000" />
+      <workItem from="1767996992665" duration="2126000" />
     </task>
     <servers />
   </component>
