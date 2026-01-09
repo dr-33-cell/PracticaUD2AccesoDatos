@@ -33,21 +33,15 @@ public class Modelo {
     void conectar() {
         try {
             conexion = DriverManager.getConnection(
-                    "jdbc:mysql://"+ip+":3306/tienda_videojuegos",user, password);
+                    "jdbc:mysql://"+ip+":3306/tienda_videojuegos","root", "");
         } catch (SQLException sqle) {
             try {
                 conexion = DriverManager.getConnection(
-                        "jdbc:mysql://"+ip+":3306/",user, password);
-
-                PreparedStatement statement = null;
+                        "jdbc:mysql://"+ip+":3306/","root", "");
 
                 String code = leerFichero();
-                String[] query = code.split("--");
-                for (String aQuery : query) {
-                    statement = conexion.prepareStatement(aQuery);
-                    statement.executeUpdate();
-                }
-                assert statement != null;
+                PreparedStatement statement = conexion.prepareStatement(code);
+                statement.executeUpdate();
                 statement.close();
 
             } catch (SQLException | IOException e) {
@@ -158,7 +152,7 @@ public class Modelo {
         PreparedStatement sentencia = null;
         ResultSet resultado = null;
         sentencia = conexion.prepareStatement(sentenciaSql);
-        resultado = sentencia.executeQuery();
+        resultado = sentencia.sexecuteQuery();
         return resultado;
     }
 
