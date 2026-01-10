@@ -49,6 +49,9 @@ public class Vista extends JFrame{
     DatePicker fechaVideojuegos;
     JTextField txtClasificacionVideojuegos;
     JTextField txtStockVideojuegos;
+    JTextField txtBusqueda;
+    JButton btnBuscar;
+    JButton btnLimpiarBusqueda;
     JButton btnVideojuegosAñadir;
     JButton btnVideojuegosModificar;
     JButton btnVideojuegosEliminar;

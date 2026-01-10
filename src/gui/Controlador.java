@@ -59,6 +59,12 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.itemSalir.addActionListener(listener);
         vista.itemDesconectar.addActionListener(listener);
         vista.btnValidate.addActionListener(listener);
+
+        // NUEVAS LÍNEAS PARA BÚSQUEDA:
+        vista.btnBuscar.addActionListener(listener);
+        vista.btnBuscar.setActionCommand("buscarVideojuego");
+        vista.btnLimpiarBusqueda.addActionListener(listener);
+        vista.btnLimpiarBusqueda.setActionCommand("limpiarBusqueda");
     }
 
     private void addWindowListeners(WindowListener listener) {
@@ -328,6 +334,8 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                     vista.plataformasTabla.clearSelection();
                 }
                 borrarCamposPlataformas();
+
+
             }
             break;
             case "eliminarPlataforma":
@@ -394,6 +402,15 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
             case "eliminarVideojuego":
                 modelo.eliminarVideojuego((Integer) vista.videojuegosTabla.getValueAt(vista.videojuegosTabla.getSelectedRow(), 0));
                 borrarCamposVideojuegos();
+                refrescarVideojuegos();
+                break;
+
+            case "buscarVideojuego":
+                buscarVideojuegos();
+                break;
+
+            case "limpiarBusqueda":
+                vista.txtBusqueda.setText("");
                 refrescarVideojuegos();
                 break;
         }
@@ -561,6 +578,29 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                 vista.fechaVideojuegos.getText().isEmpty() ||
                 vista.txtClasificacionVideojuegos.getText().isEmpty() ||
                 vista.txtStockVideojuegos.getText().isEmpty();
+    }
+
+    private void buscarVideojuegos() {
+        String textoBusqueda = vista.txtBusqueda.getText().trim();
+
+        if (textoBusqueda.isEmpty()) {
+            Util.showErrorAlert("Por favor, introduce un nombre para buscar");
+            return;
+        }
+
+        try {
+            ResultSet rs = modelo.buscarVideojuegosPorNombre(textoBusqueda);
+            vista.videojuegosTabla.setModel(construirTableModelVideojuegos(rs));
+
+            // Verificar si se encontraron resultados
+            if (vista.dtmVideojuegos.getRowCount() == 0) {
+                Util.showErrorAlert("No se encontraron videojuegos con ese nombre");
+                refrescarVideojuegos();
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            Util.showErrorAlert("Error al buscar videojuegos");
+        }
     }
 
     /*LISTENERS IMPLEMENTOS NO UTILIZADOS*/
