@@ -75,7 +75,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Principal">
+  <component name="RunManager" selected="JAR Application.PracticaUD2DanielRevuelto.jar">
     <configuration name="Principal" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.Principal" />
       <module name="PracticaUD2DanielRevuelto" />
@@ -95,8 +95,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Principal" />
         <item itemvalue="JAR Application.PracticaUD2DanielRevuelto.jar" />
+        <item itemvalue="Application.Principal" />
       </list>
     </recent_temporary>
   </component>
@@ -115,7 +115,8 @@
       <workItem from="1767881794850" duration="7468000" />
       <workItem from="1767970199299" duration="6898000" />
       <workItem from="1767996992665" duration="6239000" />
-      <workItem from="1768131763895" duration="3453000" />
+      <workItem from="1768131763895" duration="6810000" />
+      <workItem from="1768153960405" duration="3426000" />
     </task>
     <servers />
   </component>

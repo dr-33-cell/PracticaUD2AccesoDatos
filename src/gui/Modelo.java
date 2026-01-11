@@ -383,6 +383,135 @@ public class Modelo {
         return resultado;
     }
 
+    // MÉTODOS PARA VENTAS
+    void registrarVenta(String videojuego, int cantidad, float precioventa, LocalDate fechaventa, String cliente) {
+        String sentenciaSql = "{CALL registrarVenta(?, ?, ?, ?, ?)}";
+        CallableStatement sentencia = null;
+
+        int idvideojuego = Integer.valueOf(videojuego.split(" ")[0]);
+
+        try {
+            sentencia = conexion.prepareCall(sentenciaSql);
+            sentencia.setInt(1, idvideojuego);
+            sentencia.setInt(2, cantidad);
+            sentencia.setFloat(3, precioventa);
+            sentencia.setDate(4, Date.valueOf(fechaventa));
+            sentencia.setString(5, cliente);
+
+            ResultSet rs = sentencia.executeQuery();
+            if (rs.next()) {
+                String mensaje = rs.getString("Mensaje");
+                if (mensaje.contains("Error")) {
+                    throw new SQLException(mensaje);
+                }
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new RuntimeException(sqle.getMessage());
+        } finally {
+            if (sentencia != null)
+                try {
+                    sentencia.close();
+                } catch (SQLException sqle) {
+                    sqle.printStackTrace();
+                }
+        }
+    }
+
+    void eliminarVenta(int idventa) {
+        // Primero obtener los datos de la venta para restaurar el stock
+        String consultaSql = "SELECT idvideojuego, cantidad FROM ventas WHERE idventa = ?";
+        PreparedStatement consulta = null;
+
+        try {
+            consulta = conexion.prepareStatement(consultaSql);
+            consulta.setInt(1, idventa);
+            ResultSet rs = consulta.executeQuery();
+
+            if (rs.next()) {
+                int idvideojuego = rs.getInt("idvideojuego");
+                int cantidad = rs.getInt("cantidad");
+
+                // Restaurar stock
+                String updateSql = "UPDATE videojuegos SET unidadesstock = unidadesstock + ? WHERE idvideojuego = ?";
+                PreparedStatement update = conexion.prepareStatement(updateSql);
+                update.setInt(1, cantidad);
+                update.setInt(2, idvideojuego);
+                update.executeUpdate();
+                update.close();
+
+                // Eliminar venta
+                String deleteSql = "DELETE FROM ventas WHERE idventa = ?";
+                PreparedStatement delete = conexion.prepareStatement(deleteSql);
+                delete.setInt(1, idventa);
+                delete.executeUpdate();
+                delete.close();
+            }
+            consulta.close();
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+    }
+
+    ResultSet consultarVentas() throws SQLException {
+        String sentenciaSql = "SELECT v.idventa as 'ID', " +
+                "concat(vj.idvideojuego, ' - ', vj.titulo) as 'Videojuego', " +
+                "v.cantidad as 'Cantidad', " +
+                "v.precioventa as 'Precio Unitario', " +
+                "(v.cantidad * v.precioventa) as 'Total', " +
+                "v.fechaventa as 'Fecha', " +
+                "v.cliente as 'Cliente' " +
+                "FROM ventas as v " +
+                "inner join videojuegos as vj " +
+                "on vj.idvideojuego = v.idvideojuego " +
+                "ORDER BY v.fechaventa DESC";
+        PreparedStatement sentencia = null;
+        ResultSet resultado = null;
+        sentencia = conexion.prepareStatement(sentenciaSql);
+        resultado = sentencia.executeQuery();
+        return resultado;
+    }
+
+    public int obtenerStockVideojuego(int idvideojuego) {
+        String stockConsult = "SELECT obtenerStockVideojuego(?)";
+        PreparedStatement function;
+        int stock = 0;
+        try {
+            function = conexion.prepareStatement(stockConsult);
+            function.setInt(1, idvideojuego);
+            ResultSet rs = function.executeQuery();
+            rs.next();
+
+            stock = rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stock;
+    }
+
+    public Object[] obtenerEstadisticasVentas(LocalDate fechaInicio, LocalDate fechaFin) throws SQLException {
+        String sentenciaSql = "{CALL obtenerTotalVentasPorPeriodo(?, ?)}";
+        CallableStatement sentencia = null;
+
+        try {
+            sentencia = conexion.prepareCall(sentenciaSql);
+            sentencia.setDate(1, Date.valueOf(fechaInicio));
+            sentencia.setDate(2, Date.valueOf(fechaFin));
+
+            ResultSet rs = sentencia.executeQuery();
+            if (rs.next()) {
+                return new Object[]{
+                        rs.getInt("TotalVentas"),
+                        rs.getInt("UnidadesVendidas"),
+                        rs.getFloat("IngresoTotal")
+                };
+            }
+        } finally {
+            if (sentencia != null) sentencia.close();
+        }
+        return new Object[]{0, 0, 0.0f};
+    }
+
     // MÉTODOS DE VALIDACIÓN
     public boolean videojuegoCodigoYaExiste(String codigo) {
         String codigoConsult = "SELECT existeCodigo(?)";

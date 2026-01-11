@@ -7,7 +7,8 @@ import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.sql.*;
-import java.util.Vector;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Controlador implements ActionListener, ItemListener, ListSelectionListener, WindowListener {
 
@@ -25,12 +26,14 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         addWindowListeners(this);
         refrescarTodo();
         iniciar();
+        actualizarEstadisticas();
     }
 
     private void refrescarTodo() {
         refrescarDesarrolladores();
         refrescarPlataformas();
         refrescarVideojuegos();
+        refrescarVentas();
         refrescar = false;
     }
 
@@ -63,6 +66,12 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.btnBuscar.setActionCommand("buscarVideojuego");
         vista.btnLimpiarBusqueda.addActionListener(listener);
         vista.btnLimpiarBusqueda.setActionCommand("limpiarBusqueda");
+
+        // VENTAS
+        vista.btnRegistrarVenta.addActionListener(listener);
+        vista.btnRegistrarVenta.setActionCommand("registrarVenta");
+        vista.btnEliminarVenta.addActionListener(listener);
+        vista.btnEliminarVenta.setActionCommand("eliminarVenta");
     }
 
     private void addWindowListeners(WindowListener listener) {
@@ -160,6 +169,40 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                             borrarCamposVideojuegos();
                         }
                     }
+                }
+            }
+        });
+
+        // VENTAS
+        vista.ventasTabla.setCellSelectionEnabled(true);
+        ListSelectionModel cellSelectionModel4 = vista.ventasTabla.getSelectionModel();
+        cellSelectionModel4.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        cellSelectionModel4.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()
+                        && !((ListSelectionModel) e.getSource()).isSelectionEmpty()) {
+                    if (e.getSource().equals(vista.ventasTabla.getSelectionModel())) {
+                        int row = vista.ventasTabla.getSelectedRow();
+                        vista.comBoxVideojuegoVenta.setSelectedItem(String.valueOf(vista.ventasTabla.getValueAt(row, 1)));
+                        vista.txtCantidadVenta.setText(String.valueOf(vista.ventasTabla.getValueAt(row, 2)));
+                        vista.txtPrecioVenta.setText(String.valueOf(vista.ventasTabla.getValueAt(row, 3)));
+                        vista.fechaVenta.setDate((Date.valueOf(String.valueOf(vista.ventasTabla.getValueAt(row, 5)))).toLocalDate());
+                        vista.txtClienteVenta.setText(String.valueOf(vista.ventasTabla.getValueAt(row, 6)));
+                    }
+                }
+            }
+        });
+
+        // Listener para auto-completar precio al seleccionar videojuego:
+        vista.comBoxVideojuegoVenta.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED && vista.comBoxVideojuegoVenta.getSelectedIndex() != -1) {
+                    String seleccion = String.valueOf(vista.comBoxVideojuegoVenta.getSelectedItem());
+                    int idVideojuego = Integer.parseInt(seleccion.split(" ")[0]);
+                    float precio = modelo.obtenerPrecioVideojuego(idVideojuego);
+                    vista.txtPrecioVenta.setText(String.valueOf(precio));
                 }
             }
         });
@@ -412,6 +455,64 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                 vista.txtBusqueda.setText("");
                 refrescarVideojuegos();
                 break;
+
+            // VENTAS
+            case "registrarVenta": {
+                try {
+                    if (comprobarVentaVacia()) {
+                        Util.showErrorAlert("Rellena todos los campos");
+                        vista.ventasTabla.clearSelection();
+                    } else {
+                        String videojuegoSeleccionado = String.valueOf(vista.comBoxVideojuegoVenta.getSelectedItem());
+                        int idVideojuego = Integer.parseInt(videojuegoSeleccionado.split(" ")[0]);
+                        int cantidad = Integer.parseInt(vista.txtCantidadVenta.getText());
+
+                        int stockDisponible = modelo.obtenerStockVideojuego(idVideojuego);
+                        if (cantidad > stockDisponible) {
+                            Util.showErrorAlert("Stock insuficiente. Disponible: " + stockDisponible + " unidades");
+                            return;
+                        }
+
+                        modelo.registrarVenta(
+                                videojuegoSeleccionado,
+                                cantidad,
+                                Float.parseFloat(vista.txtPrecioVenta.getText()),
+                                vista.fechaVenta.getDate(),
+                                vista.txtClienteVenta.getText());
+
+                        Util.showInfoAlert("Venta registrada correctamente");
+                        refrescarVentas();
+                        refrescarVideojuegos();
+                        actualizarEstadisticas();
+                    }
+                } catch (NumberFormatException nfe) {
+                    Util.showErrorAlert("Introduce números válidos en cantidad y precio");
+                    vista.ventasTabla.clearSelection();
+                } catch (Exception ex) {
+                    Util.showErrorAlert("Error al registrar venta: " + ex.getMessage());
+                }
+                borrarCamposVentas();
+            }
+            break;
+
+            case "eliminarVenta":
+                if (vista.ventasTabla.getSelectedRow() == -1) {
+                    Util.showErrorAlert("Selecciona una venta para eliminar");
+                } else {
+                    int confirmacion = JOptionPane.showConfirmDialog(vista,
+                            "¿Estás seguro de eliminar esta venta?\nSe restaurará el stock del videojuego.",
+                            "Confirmar eliminación",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (confirmacion == JOptionPane.YES_OPTION) {
+                        modelo.eliminarVenta((Integer) vista.ventasTabla.getValueAt(vista.ventasTabla.getSelectedRow(), 0));
+                        borrarCamposVentas();
+                        refrescarVentas();
+                        refrescarVideojuegos();
+                        actualizarEstadisticas();
+                    }
+                }
+                break;
         }
     }
 
@@ -436,18 +537,28 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
 
     private DefaultTableModel construirTableModelDesarrolladores(ResultSet rs) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
-
-        Vector<String> columnNames = new Vector<>();
         int columnCount = metaData.getColumnCount();
-        for (int column = 1; column <= columnCount; column++) {
-            columnNames.add(metaData.getColumnName(column));
+
+        // Obtener nombres de columnas
+        String[] columnNames = new String[columnCount];
+        for (int i = 1; i <= columnCount; i++) {
+            columnNames[i - 1] = metaData.getColumnName(i);
         }
 
-        Vector<Vector<Object>> data = new Vector<>();
-        setDataVector(rs, columnCount, data);
+        // Obtener datos usando ArrayList
+        ArrayList<Object[]> dataList = new ArrayList<>();
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 0; i < columnCount; i++) {
+                row[i] = rs.getObject(i + 1);
+            }
+            dataList.add(row);
+        }
+
+        // Convertir ArrayList a array bidimensional
+        Object[][] data = dataList.toArray(new Object[0][]);
 
         vista.dtmDesarrolladores.setDataVector(data, columnNames);
-
         return vista.dtmDesarrolladores;
     }
 
@@ -466,24 +577,41 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
 
     private DefaultTableModel construirTableModelPlataformas(ResultSet rs) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
-
-        Vector<String> columnNames = new Vector<>();
         int columnCount = metaData.getColumnCount();
-        for (int column = 1; column <= columnCount; column++) {
-            columnNames.add(metaData.getColumnName(column));
+
+        // Obtener nombres de columnas
+        String[] columnNames = new String[columnCount];
+        for (int i = 1; i <= columnCount; i++) {
+            columnNames[i - 1] = metaData.getColumnName(i);
         }
 
-        Vector<Vector<Object>> data = new Vector<>();
-        setDataVector(rs, columnCount, data);
+        // Obtener datos usando ArrayList
+        ArrayList<Object[]> dataList = new ArrayList<>();
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 0; i < columnCount; i++) {
+                row[i] = rs.getObject(i + 1);
+            }
+            dataList.add(row);
+        }
+
+        // Convertir ArrayList a array bidimensional
+        Object[][] data = dataList.toArray(new Object[0][]);
 
         vista.dtmPlataformas.setDataVector(data, columnNames);
-
         return vista.dtmPlataformas;
     }
 
     private void refrescarVideojuegos() {
         try {
             vista.videojuegosTabla.setModel(construirTableModelVideojuegos(modelo.consultarVideojuegos()));
+
+            // Actualizar ComboBox de ventas con videojuegos
+            vista.comBoxVideojuegoVenta.removeAllItems();
+            for (int i = 0; i < vista.dtmVideojuegos.getRowCount(); i++) {
+                vista.comBoxVideojuegoVenta.addItem(vista.dtmVideojuegos.getValueAt(i, 0) + " - " +
+                        vista.dtmVideojuegos.getValueAt(i, 1));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -491,28 +619,62 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
 
     private DefaultTableModel construirTableModelVideojuegos(ResultSet rs) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
-
-        Vector<String> columnNames = new Vector<>();
         int columnCount = metaData.getColumnCount();
-        for (int column = 1; column <= columnCount; column++) {
-            columnNames.add(metaData.getColumnName(column));
+
+        // Obtener nombres de columnas
+        String[] columnNames = new String[columnCount];
+        for (int i = 1; i <= columnCount; i++) {
+            columnNames[i - 1] = metaData.getColumnName(i);
         }
 
-        Vector<Vector<Object>> data = new Vector<>();
-        setDataVector(rs, columnCount, data);
+        // Obtener datos usando ArrayList
+        ArrayList<Object[]> dataList = new ArrayList<>();
+        while (rs.next()) {
+            Object[] row = new Object[columnCount];
+            for (int i = 0; i < columnCount; i++) {
+                row[i] = rs.getObject(i + 1);
+            }
+            dataList.add(row);
+        }
+
+        // Convertir ArrayList a array bidimensional
+        Object[][] data = dataList.toArray(new Object[0][]);
 
         vista.dtmVideojuegos.setDataVector(data, columnNames);
-
         return vista.dtmVideojuegos;
     }
 
-    private void setDataVector(ResultSet rs, int columnCount, Vector<Vector<Object>> data) throws SQLException {
-        while (rs.next()) {
-            Vector<Object> vector = new Vector<>();
-            for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-                vector.add(rs.getObject(columnIndex));
+    private void refrescarVentas() {
+        try {
+            ResultSet rs = modelo.consultarVentas();
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            // Obtener nombres de columnas
+            String[] columnNames = new String[columnCount];
+            for (int i = 1; i <= columnCount; i++) {
+                columnNames[i - 1] = metaData.getColumnName(i);
             }
-            data.add(vector);
+
+            // Obtener datos usando ArrayList
+            ArrayList<Object[]> dataList = new ArrayList<>();
+            while (rs.next()) {
+                Object[] row = new Object[columnCount];
+                for (int i = 0; i < columnCount; i++) {
+                    row[i] = rs.getObject(i + 1);
+                }
+                dataList.add(row);
+            }
+
+            // Convertir ArrayList a array bidimensional
+            Object[][] data = dataList.toArray(new Object[0][]);
+
+            // Crear y asignar el modelo
+            vista.dtmVentas = new DefaultTableModel(data, columnNames);
+            vista.ventasTabla.setModel(vista.dtmVentas);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -552,6 +714,14 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.txtStockVideojuegos.setText("");
     }
 
+    private void borrarCamposVentas() {
+        vista.comBoxVideojuegoVenta.setSelectedIndex(-1);
+        vista.txtCantidadVenta.setText("");
+        vista.txtPrecioVenta.setText("");
+        vista.fechaVenta.setText("");
+        vista.txtClienteVenta.setText("");
+    }
+
     // MÉTODOS DE VALIDACIÓN
     private boolean comprobarDesarrolladorVacio() {
         return vista.txtNombreDesarrolladores.getText().isEmpty() ||
@@ -581,6 +751,13 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                 vista.txtStockVideojuegos.getText().isEmpty();
     }
 
+    private boolean comprobarVentaVacia() {
+        return vista.comBoxVideojuegoVenta.getSelectedIndex() == -1 ||
+                vista.txtCantidadVenta.getText().isEmpty() ||
+                vista.txtPrecioVenta.getText().isEmpty() ||
+                vista.fechaVenta.getText().isEmpty();
+    }
+
     // MÉTODO DE BÚSQUEDA
     private void buscarVideojuegos() {
         String textoBusqueda = vista.txtBusqueda.getText().trim();
@@ -601,6 +778,20 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         } catch (SQLException ex) {
             ex.printStackTrace();
             Util.showErrorAlert("Error al buscar videojuegos");
+        }
+    }
+
+    private void actualizarEstadisticas() {
+        try {
+            LocalDate hoy = LocalDate.now();
+            LocalDate inicioMes = hoy.withDayOfMonth(1);
+
+            Object[] stats = modelo.obtenerEstadisticasVentas(inicioMes, hoy);
+
+            vista.lblTotalVentas.setText("Ventas este mes: " + stats[0] + " (" + stats[1] + " unidades)");
+            vista.lblIngresoTotal.setText("Ingresos este mes: " + String.format("%.2f", stats[2]) + " €");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

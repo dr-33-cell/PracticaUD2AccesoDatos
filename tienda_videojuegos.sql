@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS desarrolladores (
                                                pais VARCHAR(50) NOT NULL,
                                                fundacion DATE,
                                                web VARCHAR(500),
-                                               empleados INT);
+                                               empleados INT
+);
 --
 CREATE TABLE IF NOT EXISTS plataformas (
                                            idplataforma INT AUTO_INCREMENT PRIMARY KEY,
@@ -16,7 +17,8 @@ CREATE TABLE IF NOT EXISTS plataformas (
                                            fabricante VARCHAR(50) NOT NULL,
                                            generacion INT,
                                            lanzamiento DATE,
-                                           tipo VARCHAR(30));
+                                           tipo VARCHAR(30)
+);
 --
 CREATE TABLE IF NOT EXISTS videojuegos (
                                            idvideojuego INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,11 +30,22 @@ CREATE TABLE IF NOT EXISTS videojuegos (
                                            precio FLOAT NOT NULL,
                                            fechalanzamiento DATE,
                                            clasificacion VARCHAR(10),
-                                           unidadesstock INT);
+                                           unidadesstock INT
+);
 --
 ALTER TABLE videojuegos
     ADD FOREIGN KEY (iddesarrollador) REFERENCES desarrolladores(iddesarrollador),
     ADD FOREIGN KEY (idplataforma) REFERENCES plataformas(idplataforma);
+--
+CREATE TABLE IF NOT EXISTS ventas (
+                                      idventa INT AUTO_INCREMENT PRIMARY KEY,
+                                      idvideojuego INT NOT NULL,
+                                      cantidad INT NOT NULL,
+                                      precioventa FLOAT NOT NULL,
+                                      fechaventa DATE NOT NULL,
+                                      cliente VARCHAR(100),
+                                      FOREIGN KEY (idvideojuego) REFERENCES videojuegos(idvideojuego)
+);
 --
 DELIMITER ||
 CREATE FUNCTION existeCodigo(f_codigo VARCHAR(40))
@@ -98,6 +111,18 @@ END; ||
 DELIMITER ;
 --
 DELIMITER ||
+CREATE FUNCTION obtenerStockVideojuego(f_idvideojuego INT)
+    RETURNS INT
+BEGIN
+    DECLARE v_stock INT;
+    SELECT unidadesstock INTO v_stock
+    FROM videojuegos
+    WHERE idvideojuego = f_idvideojuego;
+    RETURN v_stock;
+END; ||
+DELIMITER ;
+--
+DELIMITER ||
 CREATE PROCEDURE insertarVideojuego(
     IN p_titulo VARCHAR(100),
     IN p_codigo VARCHAR(40),
@@ -128,5 +153,52 @@ BEGIN
              INNER JOIN plataformas p ON v.idplataforma = p.idplataforma
     WHERE v.genero = p_genero
     ORDER BY v.titulo;
+END; ||
+DELIMITER ;
+--
+DELIMITER ||
+CREATE PROCEDURE registrarVenta(
+    IN p_idvideojuego INT,
+    IN p_cantidad INT,
+    IN p_precioventa FLOAT,
+    IN p_fechaventa DATE,
+    IN p_cliente VARCHAR(100))
+BEGIN
+    DECLARE v_stock INT;
+
+    -- Obtener stock actual
+    SELECT unidadesstock INTO v_stock
+    FROM videojuegos
+    WHERE idvideojuego = p_idvideojuego;
+
+    -- Verificar si hay suficiente stock
+    IF v_stock >= p_cantidad THEN
+        -- Insertar la venta
+        INSERT INTO ventas (idvideojuego, cantidad, precioventa, fechaventa, cliente)
+        VALUES (p_idvideojuego, p_cantidad, p_precioventa, p_fechaventa, p_cliente);
+
+        -- Actualizar stock
+        UPDATE videojuegos
+        SET unidadesstock = unidadesstock - p_cantidad
+        WHERE idvideojuego = p_idvideojuego;
+
+        SELECT 'Venta registrada correctamente' AS Mensaje;
+    ELSE
+        SELECT 'Error: Stock insuficiente' AS Mensaje;
+    END IF;
+END; ||
+DELIMITER ;
+--
+DELIMITER ||
+CREATE PROCEDURE obtenerTotalVentasPorPeriodo(
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE)
+BEGIN
+    SELECT
+        COUNT(*) as TotalVentas,
+        SUM(cantidad) as UnidadesVendidas,
+        SUM(precioventa * cantidad) as IngresoTotal
+    FROM ventas
+    WHERE fechaventa BETWEEN p_fecha_inicio AND p_fecha_fin;
 END; ||
 DELIMITER ;

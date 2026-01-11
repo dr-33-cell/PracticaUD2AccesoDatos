@@ -58,13 +58,28 @@ public class Vista extends JFrame{
     JButton btnVideojuegosEliminar;
     JTable videojuegosTabla;
 
+    //Ventas
+    JPanel JPanelVentas;
+    JTextField txtIdVenta;
+    JComboBox comBoxVideojuegoVenta;
+    JTextField txtCantidadVenta;
+    JTextField txtPrecioVenta;
+    DatePicker fechaVenta;
+    JTextField txtClienteVenta;
+    JButton btnRegistrarVenta;
+    JButton btnEliminarVenta;
+    JTable ventasTabla;
+    JLabel lblTotalVentas;
+    JLabel lblIngresoTotal;
+
     //busqueda
-     JLabel etiquetaEstado;
+    JLabel etiquetaEstado;
 
     //default table model
     DefaultTableModel dtmVideojuegos;
     DefaultTableModel dtmPlataformas;
     DefaultTableModel dtmDesarrolladores;
+    DefaultTableModel dtmVentas;
 
     //menubar
     JMenuItem itemOpciones;
@@ -77,7 +92,6 @@ public class Vista extends JFrame{
     JButton btnValidate;
     JPasswordField adminPassword;
     JTabbedPane tabbedPane1;
-
 
 
     public Vista() {
@@ -151,14 +165,24 @@ public class Vista extends JFrame{
         comBoxFabricPlatform.setSelectedIndex(-1);
     }
     private void setTableModels() {
-        //librosTabla, autoresTabla, editorialesTabla
-        this.dtmDesarrolladores =new DefaultTableModel();
-        this.desarrolladoresTabla.setModel(dtmDesarrolladores);
+        if (desarrolladoresTabla != null) {
+            this.dtmDesarrolladores = new DefaultTableModel();
+            this.desarrolladoresTabla.setModel(dtmDesarrolladores);
+        }
 
-        this.dtmPlataformas =new DefaultTableModel();
-        this.plataformasTabla.setModel(dtmPlataformas);
+        if (plataformasTabla != null) {
+            this.dtmPlataformas = new DefaultTableModel();
+            this.plataformasTabla.setModel(dtmPlataformas);
+        }
 
-        this.dtmVideojuegos =new DefaultTableModel();
-        this.videojuegosTabla.setModel(dtmVideojuegos);
+        if (videojuegosTabla != null) {
+            this.dtmVideojuegos = new DefaultTableModel();
+            this.videojuegosTabla.setModel(dtmVideojuegos);
+        }
+
+        if (ventasTabla != null) {
+            this.dtmVentas = new DefaultTableModel();
+            this.ventasTabla.setModel(dtmVentas);
+        }
     }
 }
