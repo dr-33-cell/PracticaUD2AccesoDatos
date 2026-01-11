@@ -146,7 +146,8 @@ public class Modelo {
                 "nombre as 'Nombre', " +
                 "pais as 'País', " +
                 "fundacion as 'Fecha de fundación', " +
-                "web as 'Web' " +
+                "web as 'Web', " +
+                "empleados as 'Empleados' " +
                 "FROM desarrolladores";
         PreparedStatement sentencia = null;
         ResultSet resultado = null;
@@ -353,6 +354,35 @@ public class Modelo {
         return resultado;
     }
 
+    // MÉTODO DE BÚSQUEDA
+    ResultSet buscarVideojuegosPorNombre(String nombre) throws SQLException {
+        String sentenciaSql = "SELECT v.idvideojuego as 'ID', " +
+                "v.titulo as 'Título', " +
+                "v.codigo as 'Código', " +
+                "concat(d.iddesarrollador, ' - ', d.nombre) as 'Desarrollador', " +
+                "concat(p.idplataforma, ' - ', p.nombre) as 'Plataforma', " +
+                "v.genero as 'Género', " +
+                "v.precio as 'Precio', " +
+                "v.fechalanzamiento as 'Fecha de lanzamiento', " +
+                "v.clasificacion as 'Clasificación', " +
+                "v.unidadesstock as 'Stock' " +
+                "FROM videojuegos as v " +
+                "inner join desarrolladores as d " +
+                "on d.iddesarrollador = v.iddesarrollador " +
+                "inner join plataformas as p " +
+                "on p.idplataforma = v.idplataforma " +
+                "WHERE v.titulo LIKE ?";
+
+        PreparedStatement sentencia = null;
+        ResultSet resultado = null;
+
+        sentencia = conexion.prepareStatement(sentenciaSql);
+        sentencia.setString(1, "%" + nombre + "%");
+        resultado = sentencia.executeQuery();
+
+        return resultado;
+    }
+
     // MÉTODOS DE VALIDACIÓN
     public boolean videojuegoCodigoYaExiste(String codigo) {
         String codigoConsult = "SELECT existeCodigo(?)";
@@ -422,36 +452,6 @@ public class Modelo {
         return precio;
     }
 
-    // En la clase Modelo, añade este método:
-
-    ResultSet buscarVideojuegosPorNombre(String nombre) throws SQLException {
-        String sentenciaSql = "SELECT v.idvideojuego as 'ID', " +
-                "v.titulo as 'Título', " +
-                "v.codigo as 'Código', " +
-                "concat(d.iddesarrollador, ' - ', d.nombre) as 'Desarrollador', " +
-                "concat(p.idplataforma, ' - ', p.nombre) as 'Plataforma', " +
-                "v.genero as 'Género', " +
-                "v.precio as 'Precio', " +
-                "v.fechalanzamiento as 'Fecha de lanzamiento', " +
-                "v.clasificacion as 'Clasificación', " +
-                "v.unidadesstock as 'Stock' " +
-                "FROM videojuegos as v " +
-                "inner join desarrolladores as d " +
-                "on d.iddesarrollador = v.iddesarrollador " +
-                "inner join plataformas as p " +
-                "on p.idplataforma = v.idplataforma " +
-                "WHERE v.titulo LIKE ?";
-
-        PreparedStatement sentencia = null;
-        ResultSet resultado = null;
-
-        sentencia = conexion.prepareStatement(sentenciaSql);
-        sentencia.setString(1, "%" + nombre + "%");
-        resultado = sentencia.executeQuery();
-
-        return resultado;
-    }
-
     // MÉTODOS DE CONFIGURACIÓN
     private void getPropValues() {
         InputStream inputStream = null;
@@ -477,7 +477,6 @@ public class Modelo {
             }
         }
     }
-
 
     void setPropValues(String ip, String user, String pass, String adminPass) {
         try {

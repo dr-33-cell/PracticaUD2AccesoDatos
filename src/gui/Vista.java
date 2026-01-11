@@ -19,6 +19,7 @@ public class Vista extends JFrame{
     JComboBox comBoxPais;
     DatePicker fechaDesarrolladores;
     JTextField txtWebDesarrolladores;
+    JTextField txtEmpleados;
     JButton btnDesarrolladoresEliminar;
     JButton btnDesarrolladoresModificar;
     JButton btnDesarrolladoresAñadir;
@@ -58,7 +59,7 @@ public class Vista extends JFrame{
     JTable videojuegosTabla;
 
     //busqueda
-    private JLabel etiquetaEstado;
+     JLabel etiquetaEstado;
 
     //default table model
     DefaultTableModel dtmVideojuegos;

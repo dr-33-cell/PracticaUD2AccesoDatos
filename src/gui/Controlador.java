@@ -59,8 +59,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.itemSalir.addActionListener(listener);
         vista.itemDesconectar.addActionListener(listener);
         vista.btnValidate.addActionListener(listener);
-
-        // NUEVAS LÍNEAS PARA BÚSQUEDA:
         vista.btnBuscar.addActionListener(listener);
         vista.btnBuscar.setActionCommand("buscarVideojuego");
         vista.btnLimpiarBusqueda.addActionListener(listener);
@@ -87,6 +85,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                         vista.comBoxPais.setSelectedItem(String.valueOf(vista.desarrolladoresTabla.getValueAt(row, 2)));
                         vista.fechaDesarrolladores.setDate((Date.valueOf(String.valueOf(vista.desarrolladoresTabla.getValueAt(row, 3)))).toLocalDate());
                         vista.txtWebDesarrolladores.setText(String.valueOf(vista.desarrolladoresTabla.getValueAt(row, 4)));
+                        vista.txtEmpleados.setText(String.valueOf(vista.desarrolladoresTabla.getValueAt(row, 5)));
                     } else if (e.getValueIsAdjusting()
                             && ((ListSelectionModel) e.getSource()).isSelectionEmpty() && !refrescar) {
                         if (e.getSource().equals(vista.desarrolladoresTabla.getSelectionModel())) {
@@ -175,6 +174,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                 vista.comBoxPais.setSelectedItem(String.valueOf(vista.desarrolladoresTabla.getValueAt(row, 2)));
                 vista.fechaDesarrolladores.setDate((Date.valueOf(String.valueOf(vista.desarrolladoresTabla.getValueAt(row, 3)))).toLocalDate());
                 vista.txtWebDesarrolladores.setText(String.valueOf(vista.desarrolladoresTabla.getValueAt(row, 4)));
+                vista.txtEmpleados.setText(String.valueOf(vista.desarrolladoresTabla.getValueAt(row, 5)));
             } else if (e.getSource().equals(vista.plataformasTabla.getSelectionModel())) {
                 int row = vista.plataformasTabla.getSelectedRow();
                 vista.txtNombrePlataformas.setText(String.valueOf(vista.plataformasTabla.getValueAt(row, 1)));
@@ -251,7 +251,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                                 String.valueOf(vista.comBoxPais.getSelectedItem()),
                                 vista.fechaDesarrolladores.getDate(),
                                 vista.txtWebDesarrolladores.getText(),
-                                0);
+                                Integer.parseInt(vista.txtEmpleados.getText()));
                         refrescarDesarrolladores();
                     }
                 } catch (NumberFormatException nfe) {
@@ -272,7 +272,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                                 String.valueOf(vista.comBoxPais.getSelectedItem()),
                                 vista.fechaDesarrolladores.getDate(),
                                 vista.txtWebDesarrolladores.getText(),
-                                0,
+                                Integer.parseInt(vista.txtEmpleados.getText()),
                                 (Integer) vista.desarrolladoresTabla.getValueAt(vista.desarrolladoresTabla.getSelectedRow(), 0));
                         refrescarDesarrolladores();
                     }
@@ -334,8 +334,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                     vista.plataformasTabla.clearSelection();
                 }
                 borrarCamposPlataformas();
-
-
             }
             break;
             case "eliminarPlataforma":
@@ -405,6 +403,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                 refrescarVideojuegos();
                 break;
 
+            // BÚSQUEDA
             case "buscarVideojuego":
                 buscarVideojuegos();
                 break;
@@ -530,6 +529,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         vista.comBoxPais.setSelectedIndex(-1);
         vista.fechaDesarrolladores.setText("");
         vista.txtWebDesarrolladores.setText("");
+        vista.txtEmpleados.setText("");
     }
 
     private void borrarCamposPlataformas() {
@@ -557,7 +557,8 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
         return vista.txtNombreDesarrolladores.getText().isEmpty() ||
                 vista.comBoxPais.getSelectedIndex() == -1 ||
                 vista.fechaDesarrolladores.getText().isEmpty() ||
-                vista.txtWebDesarrolladores.getText().isEmpty();
+                vista.txtWebDesarrolladores.getText().isEmpty() ||
+                vista.txtEmpleados.getText().isEmpty();
     }
 
     private boolean comprobarPlataformaVacia() {
@@ -580,6 +581,7 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
                 vista.txtStockVideojuegos.getText().isEmpty();
     }
 
+    // MÉTODO DE BÚSQUEDA
     private void buscarVideojuegos() {
         String textoBusqueda = vista.txtBusqueda.getText().trim();
 
@@ -592,7 +594,6 @@ public class Controlador implements ActionListener, ItemListener, ListSelectionL
             ResultSet rs = modelo.buscarVideojuegosPorNombre(textoBusqueda);
             vista.videojuegosTabla.setModel(construirTableModelVideojuegos(rs));
 
-            // Verificar si se encontraron resultados
             if (vista.dtmVideojuegos.getRowCount() == 0) {
                 Util.showErrorAlert("No se encontraron videojuegos con ese nombre");
                 refrescarVideojuegos();
